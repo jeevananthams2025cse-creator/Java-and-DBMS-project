@@ -194,10 +194,10 @@
             </div>
 
             <div class="bg-stone-50 rounded-xl p-3.5 border border-stone-200 text-xs text-stone-600 space-y-1.5 text-left">
-                <div class="font-semibold text-stone-800">Cascade actions that will be performed:</div>
+                <div class="font-semibold text-stone-800">Cascade actions and audit policy:</div>
                 <div>• Remove patient from master hospital registry.</div>
                 <div>• Delete <strong th:text="${stats.pendingRequests}">0</strong> pending blood requests.</div>
-                <div>• Purge <strong th:text="${stats.fulfilledRequests}">0</strong> historical fulfilled request logs and issues.</div>
+                <div>• <strong class="text-amber-800">Audit Rule:</strong> Patients with past clinical transfusion records cannot be deleted to preserve immutable medical logs.</div>
             </div>
 
             <form th:action="@{/patients/{id}/delete(id=${patientId})}" method="post" class="flex items-center justify-end space-x-3 pt-2">

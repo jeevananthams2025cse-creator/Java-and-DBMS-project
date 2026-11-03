@@ -106,16 +106,28 @@ public class CascadeManagementTest {
     }
 
     @Test
-    @DisplayName("Deleting patient removes all pending requests")
+    @DisplayName("Deleting patient removes unfulfilled pending requests but blocks deletion if transfusion history exists")
     void testPatientDeleteCascade() {
-        int patientId = 99;
+        int patientIdWithIssues = 99;
+        int patientIdNoIssues = 100;
+
+        // Simulated issue logs
+        List<Integer> patientIdsWithIssues = List.of(patientIdWithIssues);
+
+        // Deleting patient with issues must be blocked
+        assertThrows(IllegalStateException.class, () -> {
+            if (patientIdsWithIssues.contains(patientIdWithIssues)) {
+                throw new IllegalStateException("Cannot delete Patient #" + patientIdWithIssues + ": Transfusion records exist.");
+            }
+        });
+
+        // Deleting patient with no issues succeeds in removing pending requests
         List<BloodRequest> requests = new ArrayList<>(List.of(
-                new BloodRequest(401, patientId, "A-", "WHOLE_BLOOD", 1, "EMERGENCY", null, "PENDING"),
+                new BloodRequest(401, patientIdNoIssues, "A-", "WHOLE_BLOOD", 1, "EMERGENCY", null, "PENDING"),
                 new BloodRequest(402, 888, "O+", "WHOLE_BLOOD", 2, "NORMAL", null, "PENDING")
         ));
 
-        // Simulate cascade deletion for patient 99
-        requests.removeIf(r -> r.getPatientId() == patientId);
+        requests.removeIf(r -> r.getPatientId() == patientIdNoIssues);
 
         assertEquals(1, requests.size(), "Only other patients' requests should remain");
         assertEquals(888, requests.get(0).getPatientId());

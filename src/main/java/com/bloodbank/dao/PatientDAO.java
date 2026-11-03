@@ -171,8 +171,8 @@ public class PatientDAO {
     }
 
     public boolean deletePatientWithCascade(int patientId) {
-        String deleteIssuesSql = """
-                DELETE bi FROM blood_issues bi
+        String checkIssuesSql = """
+                SELECT COUNT(*) FROM blood_issues bi
                 JOIN blood_requests br ON bi.request_id = br.request_id
                 WHERE br.patient_id = ?
                 """;
@@ -184,13 +184,18 @@ public class PatientDAO {
             connection.setAutoCommit(false);
 
             try {
-                // 1. Delete linked blood_issues
-                try (PreparedStatement ps = connection.prepareStatement(deleteIssuesSql)) {
+                // 1. Audit check: verify patient has NO issued transfusions on record
+                try (PreparedStatement ps = connection.prepareStatement(checkIssuesSql)) {
                     ps.setInt(1, patientId);
-                    ps.executeUpdate();
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next() && rs.getInt(1) > 0) {
+                            throw new SQLException("Cannot delete Patient #" + patientId + ": Patient has " 
+                                    + rs.getInt(1) + " clinical transfusion record(s) on file. Medical audit logs are permanent and immutable.");
+                        }
+                    }
                 }
 
-                // 2. Delete blood requests
+                // 2. Delete blood requests (pending/unfulfilled only, as no issues exist)
                 try (PreparedStatement ps = connection.prepareStatement(deleteRequestsSql)) {
                     ps.setInt(1, patientId);
                     ps.executeUpdate();
@@ -208,19 +213,19 @@ public class PatientDAO {
                 }
 
                 connection.commit();
-                System.out.println("Patient #" + patientId + " and all linked records deleted successfully.");
+                System.out.println("Patient #" + patientId + " and unfulfilled requests deleted successfully.");
                 return true;
 
             } catch (SQLException e) {
                 connection.rollback();
-                System.out.println("Failed to delete patient with cascade: " + e.getMessage());
-                return false;
+                System.out.println("Failed to delete patient: " + e.getMessage());
+                throw new RuntimeException(e.getMessage(), e);
             } finally {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException e) {
             System.out.println("Database connection failed: " + e.getMessage());
-            return false;
+            throw new RuntimeException("Database error: " + e.getMessage(), e);
         }
     }
 
