@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html(
+        pageTitle='Issue History',
+        content=~{::content}
+      )}">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<div th:fragment="content">
+
+    <!-- Page Header -->
+    <div th:replace="~{layout/components :: pageHeader(
+        title='Blood Issue History',
+        description='Immutable clinical audit log of all blood units dispatched and delivered to hospital patients.',
+        actionUrl=@{/requests},
+        actionText='View Requests',
+        actionIcon='clipboard-list'
+    )}"></div>
+
+    <!-- Data Table Card -->
+    <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+        
+        <div class="overflow-x-auto" th:if="${!issues.isEmpty()}">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-stone-200 bg-stone-50/75 text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
+                        <th class="py-3 px-4">Issue ID</th>
+                        <th class="py-3 px-4">Request Ref</th>
+                        <th class="py-3 px-4">Patient & Hospital</th>
+                        <th class="py-3 px-4">Dispatched Unit</th>
+                        <th class="py-3 px-4">Blood Group</th>
+                        <th class="py-3 px-4">Product Type</th>
+                        <th class="py-3 px-4 text-right">Dispatched Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100 text-sm text-stone-700">
+                    <tr th:each="issue : ${issues}" class="hover:bg-stone-50/75 transition-colors">
+                        <td class="py-3.5 px-4 font-mono text-xs font-semibold text-stone-900" th:text="${'#ISS-' + issue.issueId}">#ISS-1</td>
+                        <td class="py-3.5 px-4">
+                            <a th:href="@{/requests}" class="font-mono text-xs text-red-700 hover:text-red-800 font-semibold underline" 
+                               th:text="${'#REQ-' + issue.requestId}">#REQ-10</a>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <span class="font-semibold text-stone-900 block" th:text="${issue.patientName}">Jane Doe</span>
+                            <span class="text-xs text-stone-500" th:text="${issue.hospital}">City General Hospital</span>
+                        </td>
+                        <td class="py-3.5 px-4 font-mono text-xs text-stone-900" th:text="${'#U-' + issue.unitId}">#U-105</td>
+                        <td class="py-3.5 px-4">
+                            <span th:replace="~{layout/components :: bloodGroupChip(group=${issue.bloodGroup})}">A+</span>
+                        </td>
+                        <td class="py-3.5 px-4 text-xs text-stone-600" th:text="${issue.productType}">WHOLE_BLOOD</td>
+                        <td class="py-3.5 px-4 font-mono text-xs text-stone-600 text-right" 
+                            th:text="${#temporals.format(issue.issueDate, 'yyyy-MM-dd HH:mm:ss')}">2026-02-01 14:22:00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${issues.isEmpty()}" class="p-8">
+            <div th:replace="~{layout/components :: emptyState(
+                icon='history',
+                title='No blood issues recorded yet',
+                message='No blood units have been fulfilled or dispatched. Once requests are fulfilled, their dispatch log will appear here.',
+                actionUrl=@{/requests},
+                actionText='Check Pending Requests'
+            )}"></div>
+        </div>
+
+        <!-- Pagination -->
+        <div th:replace="~{layout/components :: pagination(
+            currentPage=${currentPage},
+            totalPages=${totalPages},
+            queryParams=''
+        )}"></div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

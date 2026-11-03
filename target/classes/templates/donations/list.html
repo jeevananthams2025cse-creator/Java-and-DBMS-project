@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html(
+        pageTitle='Donations History',
+        content=~{::content}
+      )}">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<div th:fragment="content">
+
+    <!-- Page Header -->
+    <div th:replace="~{layout/components :: pageHeader(
+        title='Donation History',
+        description='Historical log of voluntary blood collection entries and linked inventory units.',
+        actionUrl=@{/donations/new},
+        actionText='Record Donation',
+        actionIcon='heart-pulse'
+    )}"></div>
+
+    <!-- Filter Bar -->
+    <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm mb-6">
+        <form th:action="@{/donations}" method="get" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <!-- From Date -->
+            <div class="flex-1">
+                <label class="block text-[11px] font-semibold text-stone-500 uppercase tracking-wider mb-1">From Date</label>
+                <input type="date" name="fromDate" th:value="${fromDate}" 
+                       class="block w-full px-3 py-2 text-sm text-stone-900 bg-stone-50 border border-stone-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-colors">
+            </div>
+
+            <!-- To Date -->
+            <div class="flex-1">
+                <label class="block text-[11px] font-semibold text-stone-500 uppercase tracking-wider mb-1">To Date</label>
+                <input type="date" name="toDate" th:value="${toDate}" 
+                       class="block w-full px-3 py-2 text-sm text-stone-900 bg-stone-50 border border-stone-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-colors">
+            </div>
+
+            <!-- Blood Group -->
+            <div class="w-full sm:w-44">
+                <label class="block text-[11px] font-semibold text-stone-500 uppercase tracking-wider mb-1">Blood Group</label>
+                <select name="bloodGroup" 
+                        class="block w-full px-3 py-2 text-sm text-stone-900 bg-stone-50 border border-stone-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-colors">
+                    <option value="ALL" th:selected="${selectedBloodGroup == 'ALL'}">All Groups</option>
+                    <option th:each="bg : ${bloodGroups}" 
+                            th:value="${bg}" 
+                            th:text="${bg}" 
+                            th:selected="${selectedBloodGroup == bg}">A+</option>
+                </select>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex items-end gap-2 pt-5 sm:pt-0">
+                <button type="submit" 
+                        class="flex-1 sm:flex-initial inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-stone-900 hover:bg-stone-800 rounded-xl transition-colors">
+                    <i data-lucide="filter" class="w-4 h-4 mr-1.5"></i> Filter
+                </button>
+                <a th:if="${fromDate != null or toDate != null or (selectedBloodGroup != null and selectedBloodGroup != 'ALL')}" 
+                   th:href="@{/donations}" 
+                   class="inline-flex items-center justify-center p-2 text-sm font-medium text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-xl transition-colors"
+                   title="Clear filters">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+        
+        <div class="overflow-x-auto" th:if="${!donations.isEmpty()}">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-stone-200 bg-stone-50/75 text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
+                        <th class="py-3 px-4">Donation ID</th>
+                        <th class="py-3 px-4">Donor Name</th>
+                        <th class="py-3 px-4">Blood Group</th>
+                        <th class="py-3 px-4">Product Type</th>
+                        <th class="py-3 px-4">Units (Qty)</th>
+                        <th class="py-3 px-4">Collection Date</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100 text-sm text-stone-700">
+                    <tr th:each="donation : ${donations}" class="hover:bg-stone-50/75 transition-colors">
+                        <td class="py-3.5 px-4 font-mono text-xs text-stone-500" th:text="${'#DN-' + donation.donationId}">#DN-1</td>
+                        <td class="py-3.5 px-4">
+                            <span class="font-semibold text-stone-900 block" th:text="${donation.donorName}">Johnathan Doe</span>
+                            <span class="text-xs text-stone-400 font-mono" th:text="${'Donor ID: #' + donation.donorId}">Donor ID: #1</span>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <span th:replace="~{layout/components :: bloodGroupChip(group=${donation.bloodGroup})}">O+</span>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <span class="inline-flex items-center text-xs font-medium text-stone-700 bg-stone-100 px-2 py-0.5 rounded border border-stone-200" th:text="${donation.productType}">WHOLE_BLOOD</span>
+                        </td>
+                        <td class="py-3.5 px-4 font-semibold text-stone-900" th:text="${donation.quantity + ' unit'}">1 unit</td>
+                        <td class="py-3.5 px-4 font-mono text-xs text-stone-600" th:text="${#temporals.format(donation.donationDate, 'yyyy-MM-dd')}">2026-02-01</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${donations.isEmpty()}" class="p-8">
+            <div th:replace="~{layout/components :: emptyState(
+                icon='heart-handshake',
+                title='No donations recorded',
+                message='No blood donation events matched your criteria. Use the button below to register a collection event.',
+                actionUrl=@{/donations/new},
+                actionText='Record New Donation'
+            )}"></div>
+        </div>
+
+        <!-- Pagination -->
+        <div th:replace="~{layout/components :: pagination(
+            currentPage=${currentPage},
+            totalPages=${totalPages},
+            queryParams=''
+        )}"></div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

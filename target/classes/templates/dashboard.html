@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html(
+        pageTitle='Dashboard',
+        content=~{::content}
+      )}">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<div th:fragment="content">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 mb-8 border-b border-stone-200 gap-4">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-stone-900">Dashboard</h1>
+            <p class="text-sm text-stone-500 mt-1">Real-time inventory metrics, donor registry, and clinical request status.</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <a th:href="@{/requests/new}" 
+               class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-white bg-red-700 hover:bg-red-800 rounded-xl shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2">
+                <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                New Blood Request
+            </a>
+        </div>
+    </div>
+
+    <!-- 4 KPI Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        
+        <!-- KPI 1: Available Units -->
+        <a th:href="@{/inventory/available}" class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:border-emerald-300 transition-all group block">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-stone-500 uppercase tracking-wider">Available Units</span>
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <i data-lucide="droplets" class="w-5 h-5"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-baseline justify-between">
+                <span class="text-3xl font-bold tracking-tight text-stone-900" th:text="${kpis.availableUnits}">0</span>
+                <span class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Non-Expired</span>
+            </div>
+            <p class="text-xs text-stone-400 mt-2">Ready for clinical allocation</p>
+        </a>
+
+        <!-- KPI 2: Pending Requests -->
+        <a th:href="@{/requests}" class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:border-amber-300 transition-all group block">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-stone-500 uppercase tracking-wider">Pending Requests</span>
+                <div th:class="${kpis.emergencyPendingRequests > 0 ? 'w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center group-hover:scale-105 transition-transform animate-pulse' : 'w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-105 transition-transform'}">
+                    <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-baseline justify-between">
+                <span class="text-3xl font-bold tracking-tight text-stone-900" th:text="${kpis.pendingRequests}">0</span>
+                <span th:if="${kpis.emergencyPendingRequests > 0}" class="text-xs font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full border border-red-200" th:text="${kpis.emergencyPendingRequests + ' Emergency'}">1 Emergency</span>
+                <span th:unless="${kpis.emergencyPendingRequests > 0}" class="text-xs font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Awaiting Fulfilment</span>
+            </div>
+            <p class="text-xs text-stone-400 mt-2">Hospital patient orders</p>
+        </a>
+
+        <!-- KPI 3: Total Donors -->
+        <a th:href="@{/donors}" class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:border-stone-300 transition-all group block">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-stone-500 uppercase tracking-wider">Registered Donors</span>
+                <div class="w-10 h-10 rounded-xl bg-red-50 text-red-700 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-baseline justify-between">
+                <span class="text-3xl font-bold tracking-tight text-stone-900" th:text="${kpis.totalDonors}">0</span>
+                <span class="text-xs font-medium text-stone-600 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200">Active Registry</span>
+            </div>
+            <p class="text-xs text-stone-400 mt-2">Eligible voluntary donors</p>
+        </a>
+
+        <!-- KPI 4: Registered Patients -->
+        <a th:href="@{/patients}" class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:border-stone-300 transition-all group block">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-stone-500 uppercase tracking-wider">Registered Patients</span>
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <i data-lucide="user-check" class="w-5 h-5"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-baseline justify-between">
+                <span class="text-3xl font-bold tracking-tight text-stone-900" th:text="${kpis.totalPatients}">0</span>
+                <span class="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Across Hospitals</span>
+            </div>
+            <p class="text-xs text-stone-400 mt-2">Receiving patient records</p>
+        </a>
+
+    </div>
+
+    <!-- Blood Group Stock Summary -->
+    <div class="bg-white rounded-xl border border-stone-200 p-6 shadow-sm mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 mb-6 border-b border-stone-100 gap-2">
+            <div>
+                <h2 class="text-base font-bold text-stone-900">Blood Group Stock Summary</h2>
+                <p class="text-xs text-stone-500">Available, non-expired units ready in current inventory</p>
+            </div>
+            <a th:href="@{/inventory}" class="text-xs font-semibold text-red-700 hover:text-red-800 inline-flex items-center">
+                Full Inventory View <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
+            </a>
+        </div>
+
+        <!-- 8 Blood Groups Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+            <div th:each="entry : ${kpis.stockByBloodGroup}" 
+                 class="p-4 rounded-xl border border-stone-200 bg-stone-50/50 flex flex-col items-center justify-center text-center hover:bg-white hover:border-red-200 hover:shadow-sm transition-all">
+                <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-red-100 text-red-800 font-bold text-sm mb-2"
+                      th:text="${entry.key}">A+</span>
+                <span class="text-2xl font-bold text-stone-900" th:text="${entry.value}">0</span>
+                <span class="text-[11px] font-medium text-stone-500 mt-0.5">units</span>
+                <div class="mt-2">
+                    <span th:if="${entry.value == 0}" class="inline-flex items-center text-[10px] font-semibold text-red-700 bg-red-50 px-1.5 py-0.5 rounded border border-red-200">
+                        Critical
+                    </span>
+                    <span th:if="${entry.value > 0 and entry.value <= 2}" class="inline-flex items-center text-[10px] font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                        Low
+                    </span>
+                    <span th:if="${entry.value > 2}" class="inline-flex items-center text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                        Good
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Direct Registry Record Management (Edit / Delete) -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h2 class="text-base font-bold text-stone-900">Direct Record Management (Edit / Delete)</h2>
+                <p class="text-xs text-stone-500">Quickly edit or delete a Donor or Patient directly by ID with automatic relational cascade updates.</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <!-- Manage Donor Card -->
+            <div class="bg-white rounded-xl border border-stone-200 p-6 shadow-sm hover:border-red-200 transition-all">
+                <div class="flex items-center justify-between pb-3 border-b border-stone-100 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-red-50 text-red-700 flex items-center justify-center font-bold">
+                            <i data-lucide="users" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-stone-900">Manage Donor by ID</h3>
+                            <p class="text-[11px] text-stone-400">Cascades blood group to available units & safely unlinks issued units</p>
+                        </div>
+                    </div>
+                    <a th:href="@{/donors}" class="text-xs font-semibold text-red-700 hover:text-red-800 inline-flex items-center">
+                        All Donors <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
+                    </a>
+                </div>
+
+                <form th:action="@{/donors/manage}" method="get" class="space-y-3">
+                    <label class="block text-xs font-medium text-stone-600">Enter Donor ID to Edit or Delete:</label>
+                    <div class="flex gap-2">
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-400 font-mono text-xs">
+                                #D-
+                            </div>
+                            <input type="text" name="donorId" required placeholder="e.g. 1" 
+                                   class="block w-full pl-9 pr-3 py-2 text-sm text-stone-900 bg-stone-50 border border-stone-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-colors">
+                        </div>
+                        <button type="submit" name="action" value="edit"
+                                class="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-stone-900 hover:bg-stone-800 rounded-xl transition-colors shrink-0">
+                            <i data-lucide="edit-3" class="w-3.5 h-3.5 mr-1.5"></i> Edit Donor
+                        </button>
+                        <button type="submit" name="action" value="delete"
+                                class="inline-flex items-center px-3.5 py-2 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition-colors shrink-0">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1.5"></i> Delete
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Manage Patient Card -->
+            <div class="bg-white rounded-xl border border-stone-200 p-6 shadow-sm hover:border-blue-200 transition-all">
+                <div class="flex items-center justify-between pb-3 border-b border-stone-100 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
+                            <i data-lucide="user-check" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-stone-900">Manage Patient by ID</h3>
+                            <p class="text-[11px] text-stone-400">Cascades blood group to pending requests & purges issue logs</p>
+                        </div>
+                    </div>
+                    <a th:href="@{/patients}" class="text-xs font-semibold text-blue-700 hover:text-blue-800 inline-flex items-center">
+                        All Patients <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
+                    </a>
+                </div>
+
+                <form th:action="@{/patients/manage}" method="get" class="space-y-3">
+                    <label class="block text-xs font-medium text-stone-600">Enter Patient ID to Edit or Delete:</label>
+                    <div class="flex gap-2">
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-400 font-mono text-xs">
+                                #P-
+                            </div>
+                            <input type="text" name="patientId" required placeholder="e.g. 1" 
+                                   class="block w-full pl-9 pr-3 py-2 text-sm text-stone-900 bg-stone-50 border border-stone-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-colors">
+                        </div>
+                        <button type="submit" name="action" value="edit"
+                                class="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-stone-900 hover:bg-stone-800 rounded-xl transition-colors shrink-0">
+                            <i data-lucide="edit-3" class="w-3.5 h-3.5 mr-1.5"></i> Edit Patient
+                        </button>
+                        <button type="submit" name="action" value="delete"
+                                class="inline-flex items-center px-3.5 py-2 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition-colors shrink-0">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1.5"></i> Delete
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Action Navigation Hub -->
+    <div>
+        <h2 class="text-base font-bold text-stone-900 mb-4">Quick Operation Links</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <a th:href="@{/donors/new}" class="p-4 bg-white rounded-xl border border-stone-200 hover:border-red-300 hover:shadow-sm transition-all flex items-center space-x-3.5 group">
+                <div class="w-10 h-10 rounded-xl bg-red-50 text-red-700 flex items-center justify-center group-hover:bg-red-700 group-hover:text-white transition-colors shrink-0">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-sm font-semibold text-stone-900 block group-hover:text-red-700 transition-colors">Register Donor</span>
+                    <span class="text-xs text-stone-500 block">Add eligible volunteer</span>
+                </div>
+            </a>
+
+            <a th:href="@{/patients/new}" class="p-4 bg-white rounded-xl border border-stone-200 hover:border-red-300 hover:shadow-sm transition-all flex items-center space-x-3.5 group">
+                <div class="w-10 h-10 rounded-xl bg-stone-100 text-stone-700 flex items-center justify-center group-hover:bg-stone-800 group-hover:text-white transition-colors shrink-0">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-sm font-semibold text-stone-900 block group-hover:text-stone-900 transition-colors">Register Patient</span>
+                    <span class="text-xs text-stone-500 block">Hospital admissions</span>
+                </div>
+            </a>
+
+            <a th:href="@{/donations/new}" class="p-4 bg-white rounded-xl border border-stone-200 hover:border-red-300 hover:shadow-sm transition-all flex items-center space-x-3.5 group">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center group-hover:bg-emerald-700 group-hover:text-white transition-colors shrink-0">
+                    <i data-lucide="heart-pulse" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-sm font-semibold text-stone-900 block group-hover:text-emerald-700 transition-colors">Record Donation</span>
+                    <span class="text-xs text-stone-500 block">Collect unit & update stock</span>
+                </div>
+            </a>
+
+            <a th:href="@{/requests}" class="p-4 bg-white rounded-xl border border-stone-200 hover:border-red-300 hover:shadow-sm transition-all flex items-center space-x-3.5 group">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-colors shrink-0">
+                    <i data-lucide="check-square" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-sm font-semibold text-stone-900 block group-hover:text-amber-700 transition-colors">Fulfil Requests</span>
+                    <span class="text-xs text-stone-500 block">Match compatible units</span>
+                </div>
+            </a>
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

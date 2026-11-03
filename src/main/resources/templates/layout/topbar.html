@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<header th:fragment="topbar" 
+        class="h-16 bg-white/90 backdrop-blur-md border-b border-stone-200 sticky top-0 z-20 flex items-center justify-between px-6">
+    
+    <!-- Left: Mobile Toggle & Page Title/Context -->
+    <div class="flex items-center space-x-3">
+        <button id="sidebar-toggle" type="button" 
+                class="lg:hidden p-2 rounded-lg text-stone-500 hover:text-stone-900 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-red-500">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <div class="flex items-center space-x-2 text-sm text-stone-500">
+            <span class="font-medium text-stone-900">Blood Bank Management</span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-stone-400"></i>
+            <span class="capitalize text-stone-600 font-medium" th:text="${activeModule != null ? activeModule : 'System'}">Dashboard</span>
+        </div>
+    </div>
+
+    <!-- Right: Operational Badge & Profile Pill -->
+    <div class="flex items-center space-x-4">
+        <!-- System Status Pill -->
+        <div class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1.5"></span>
+            Inventory Engine Live
+        </div>
+
+        <!-- Quick Action Button -->
+        <a th:href="@{/requests/new}" 
+           class="hidden md:inline-flex items-center px-3 py-1.5 text-xs font-semibold text-white bg-red-700 hover:bg-red-800 rounded-lg shadow-sm transition-colors">
+            <i data-lucide="plus" class="w-3.5 h-3.5 mr-1"></i> New Request
+        </a>
+
+        <!-- Admin Profile Pill -->
+        <div class="flex items-center pl-3 border-l border-stone-200 space-x-2">
+            <div class="w-8 h-8 rounded-full bg-red-100 text-red-800 border border-red-200 flex items-center justify-center font-bold text-xs">
+                <i data-lucide="shield-check" class="w-4 h-4 text-red-700"></i>
+            </div>
+            <span class="hidden sm:inline-block text-xs font-medium text-stone-700" th:text="${#authentication != null ? #authentication.name : 'Administrator'}">admin@bloodbank.com</span>
+        </div>
+    </div>
+</header>
+
+</body>
+</html>

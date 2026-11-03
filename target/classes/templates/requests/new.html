@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html(
+        pageTitle='New Blood Request',
+        content=~{::content}
+      )}">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<div th:fragment="content">
+
+    <!-- Page Header -->
+    <div th:replace="~{layout/components :: pageHeader(
+        title='Register Blood Request',
+        description='Submit an authorized clinical blood product request for an admitted hospital patient.',
+        actionUrl=@{/requests},
+        actionText='Back to Requests',
+        actionIcon='arrow-left'
+    )}"></div>
+
+    <div class="max-w-2xl bg-white rounded-xl border border-stone-200 shadow-sm p-6 sm:p-8">
+        
+        <form th:action="@{/requests}" th:object="${requestForm}" method="post" class="space-y-6">
+            <!-- CSRF Token -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <!-- Patient Selector -->
+            <div>
+                <label for="patientId" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5">
+                    Admitted Patient <span class="text-red-600">*</span>
+                </label>
+                <div class="relative rounded-xl shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                        <i data-lucide="user" class="w-4 h-4"></i>
+                    </div>
+                    <select id="patientId" th:field="*{patientId}" 
+                            class="block w-full pl-10 pr-3.5 py-2.5 text-sm text-stone-900 bg-stone-50 border border-stone-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-colors">
+                        <option value="">-- Choose Admitted Patient --</option>
+                        <option th:each="p : ${patients}" 
+                                th:value="${p.id}" 
+                                th:text="${p.name + ' (' + p.bloodGroup + ') - Hospital: ' + p.hospital}">
+                            Jane Doe (A+)
+                        </option>
+                    </select>
+                </div>
+                <p th:if="${#fields.hasErrors('patientId')}" th:errors="*{patientId}" class="mt-1.5 text-xs text-red-600 font-medium flex items-center">
+                    <i data-lucide="alert-circle" class="w-3.5 h-3.5 mr-1"></i> Patient selection error
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <!-- Blood Group -->
+                <div>
+                    <label for="bloodGroup" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5">
+                        Required Blood Group <span class="text-red-600">*</span>
+                    </label>
+                    <div class="relative rounded-xl shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                            <i data-lucide="droplet" class="w-4 h-4"></i>
+                        </div>
+                        <select id="bloodGroup" th:field="*{bloodGroup}" 
+                                class="block w-full pl-10 pr-3.5 py-2.5 text-sm text-stone-900 bg-stone-50 border border-stone-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-colors">
+                            <option value="">-- Select Blood Group --</option>
+                            <option th:each="bg : ${bloodGroups}" th:value="${bg}" th:text="${bg}">A+</option>
+                        </select>
+                    </div>
+                    <p th:if="${#fields.hasErrors('bloodGroup')}" th:errors="*{bloodGroup}" class="mt-1.5 text-xs text-red-600 font-medium flex items-center">
+                        <i data-lucide="alert-circle" class="w-3.5 h-3.5 mr-1"></i> Blood group error
+                    </p>
+                </div>
+
+                <!-- Units Required -->
+                <div>
+                    <label for="unitsRequired" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5">
+                        Units Required <span class="text-red-600">*</span>
+                    </label>
+                    <div class="relative rounded-xl shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                            <i data-lucide="hash" class="w-4 h-4"></i>
+                        </div>
+                        <input type="number" id="unitsRequired" th:field="*{unitsRequired}" min="1" max="20" 
+                               class="block w-full pl-10 pr-3.5 py-2.5 text-sm text-stone-900 bg-stone-50 border border-stone-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-colors">
+                    </div>
+                    <p th:if="${#fields.hasErrors('unitsRequired')}" th:errors="*{unitsRequired}" class="mt-1.5 text-xs text-red-600 font-medium flex items-center">
+                        <i data-lucide="alert-circle" class="w-3.5 h-3.5 mr-1"></i> Units count error
+                    </p>
+                </div>
+            </div>
+
+            <!-- Priority -->
+            <div>
+                <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
+                    Clinical Urgency / Priority <span class="text-red-600">*</span>
+                </label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <label class="flex items-center p-3 border border-stone-200 rounded-xl cursor-pointer hover:bg-stone-50 transition-colors">
+                        <input type="radio" th:field="*{priority}" value="NORMAL" class="text-red-700 focus:ring-red-600 mr-2.5">
+                        <div>
+                            <span class="text-sm font-semibold text-stone-900 block">Normal</span>
+                            <span class="text-[11px] text-stone-500 block">Standard clinical order</span>
+                        </div>
+                    </label>
+                    <label class="flex items-center p-3 border border-amber-200 bg-amber-50/40 rounded-xl cursor-pointer hover:bg-amber-50 transition-colors">
+                        <input type="radio" th:field="*{priority}" value="URGENT" class="text-amber-600 focus:ring-amber-500 mr-2.5">
+                        <div>
+                            <span class="text-sm font-semibold text-amber-900 block">Urgent</span>
+                            <span class="text-[11px] text-amber-700 block">Required within hours</span>
+                        </div>
+                    </label>
+                    <label class="flex items-center p-3 border border-red-200 bg-red-50/40 rounded-xl cursor-pointer hover:bg-red-50 transition-colors">
+                        <input type="radio" th:field="*{priority}" value="EMERGENCY" class="text-red-700 focus:ring-red-600 mr-2.5">
+                        <div>
+                            <span class="text-sm font-bold text-red-900 block">Emergency</span>
+                            <span class="text-[11px] text-red-700 block">Immediate life support</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Product Type -->
+            <div>
+                <label for="productType" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5">
+                    Product Type
+                </label>
+                <input type="text" id="productType" th:field="*{productType}" readonly 
+                       class="block w-full px-3.5 py-2.5 text-sm font-semibold text-stone-600 bg-stone-100 border border-stone-200 rounded-xl cursor-not-allowed">
+            </div>
+
+            <!-- Buttons -->
+            <div class="pt-4 border-t border-stone-200 flex items-center justify-end space-x-3">
+                <a th:href="@{/requests}" 
+                   class="px-4 py-2 text-sm font-medium text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors">
+                    Cancel
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-red-700 hover:bg-red-800 active:bg-red-900 rounded-xl shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2">
+                    <i data-lucide="check" class="w-4 h-4 mr-2"></i> Register Request
+                </button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

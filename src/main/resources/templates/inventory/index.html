@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: html(
+        pageTitle='Blood Inventory',
+        content=~{::content}
+      )}">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<div th:fragment="content">
+
+    <!-- Page Header -->
+    <div th:replace="~{layout/components :: pageHeader(
+        title='Blood Inventory Overview',
+        description='Stock distribution per blood group, shelf life monitoring, and expiration audits.',
+        actionUrl=@{/inventory/available},
+        actionText='Inspect Available Units',
+        actionIcon='check-circle'
+    )}"></div>
+
+    <!-- 3 Summary Metrics -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+        
+        <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-stone-500 uppercase tracking-wider">Available Units</span>
+                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i data-lucide="droplets" class="w-5 h-5"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-baseline">
+                <span class="text-3xl font-bold tracking-tight text-stone-900" th:text="${totalAvailable}">0</span>
+                <span class="ml-2 text-xs text-stone-400">units in stock</span>
+            </div>
+            <p class="text-xs text-emerald-700 mt-2 font-medium">Ready for recipient transfusion</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-stone-500 uppercase tracking-wider">Expiring Soon</span>
+                <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <i data-lucide="clock" class="w-5 h-5"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-baseline">
+                <span class="text-3xl font-bold tracking-tight text-amber-600" th:text="${totalExpiringSoon}">0</span>
+                <span class="ml-2 text-xs text-stone-400">within 7 days</span>
+            </div>
+            <p class="text-xs text-amber-700 mt-2 font-medium">Prioritize in FEFO fulfillment</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-stone-500 uppercase tracking-wider">Expired / Discarded</span>
+                <div class="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-baseline">
+                <span class="text-3xl font-bold tracking-tight text-red-600" th:text="${totalExpired}">0</span>
+                <span class="ml-2 text-xs text-stone-400">units non-viable</span>
+            </div>
+            <p class="text-xs text-red-700 mt-2 font-medium">Excluded from clinical matching</p>
+        </div>
+
+    </div>
+
+    <!-- Stock Table -->
+    <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-stone-200 flex items-center justify-between">
+            <h2 class="text-base font-bold text-stone-900">Stock per Blood Group</h2>
+            <span class="text-xs text-stone-400">8 Standard ABO/Rh Groups</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-stone-200 bg-stone-50/75 text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
+                        <th class="py-3 px-6">Blood Group</th>
+                        <th class="py-3 px-6">Available (Non-Expired)</th>
+                        <th class="py-3 px-6">Expiring Soon (&lt;7 days)</th>
+                        <th class="py-3 px-6">Expired</th>
+                        <th class="py-3 px-6">Total Collected</th>
+                        <th class="py-3 px-6 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100 text-sm text-stone-700">
+                    <tr th:each="stock : ${stockDetails}" class="hover:bg-stone-50/75 transition-colors">
+                        <td class="py-4 px-6">
+                            <span th:replace="~{layout/components :: bloodGroupChip(group=${stock.bloodGroup})}">A+</span>
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-base font-bold text-stone-900" th:text="${stock.availableUnits}">0</span>
+                                <span th:if="${stock.availableUnits == 0}" class="text-[10px] font-semibold text-red-700 bg-red-50 px-1.5 py-0.5 rounded border border-red-200">Critical</span>
+                                <span th:if="${stock.availableUnits > 0 and stock.availableUnits <= 2}" class="text-[10px] font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">Low</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <span th:if="${stock.expiringSoonUnits > 0}" class="inline-flex items-center font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200 text-xs">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 text-amber-500"></i>
+                                <span th:text="${stock.expiringSoonUnits + ' units'}">1 unit</span>
+                            </span>
+                            <span th:unless="${stock.expiringSoonUnits > 0}" class="text-xs text-stone-400">&mdash;</span>
+                        </td>
+                        <td class="py-4 px-6">
+                            <span th:if="${stock.expiredUnits > 0}" class="text-xs font-medium text-red-600" th:text="${stock.expiredUnits + ' units'}">0 units</span>
+                            <span th:unless="${stock.expiredUnits > 0}" class="text-xs text-stone-400">&mdash;</span>
+                        </td>
+                        <td class="py-4 px-6 text-stone-600 font-mono text-xs" th:text="${stock.totalUnits}">0</td>
+                        <td class="py-4 px-6 text-right">
+                            <a th:href="@{/inventory/available(bloodGroup=${stock.bloodGroup})}" 
+                               class="text-xs font-semibold text-red-700 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg border border-red-200 transition-colors inline-flex items-center">
+                                Inspect Units <i data-lucide="chevron-right" class="w-3.5 h-3.5 ml-1"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

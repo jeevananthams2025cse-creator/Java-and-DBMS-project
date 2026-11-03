@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null} ? ${pageTitle + ' | Uthiram'} : 'Uthiram | Blood Bank Management System'">Uthiram | Blood Bank Management System</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#FAFAF9',
+                        card: '#FFFFFF',
+                        border: '#E7E5E4',
+                        crimson: {
+                            50: '#FEF2F2',
+                            100: '#FEE2E2',
+                            200: '#FECACA',
+                            500: '#EF4444',
+                            700: '#B91C1C',
+                            800: '#991B1B',
+                            900: '#7F1D1D'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        'xl': '12px',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            background-color: #FAFAF9;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FAFAF9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D6D3D1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A8A29E;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-stone-900 flex flex-col antialiased bg-[#FAFAF9]">
+
+    <div class="flex min-h-screen">
+        <!-- Persistent Sidebar -->
+        <div th:replace="~{layout/sidebar :: sidebar}"></div>
+
+        <!-- Main Content Column -->
+        <div class="flex-1 flex flex-col min-w-0">
+            <!-- Topbar -->
+            <div th:replace="~{layout/topbar :: topbar}"></div>
+
+            <!-- Page Body Container -->
+            <main class="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">
+                <!-- Flash Messages -->
+                <div th:replace="~{layout/components :: flashMessages}"></div>
+
+                <!-- Page Specific Content -->
+                <div th:replace="${content}"></div>
+            </main>
+
+            <!-- Light Footer -->
+            <footer class="py-4 px-8 border-t border-stone-200 text-center text-xs text-stone-400 bg-white/50">
+                Uthiram Blood Bank Management System &bull; Java 21 &bull; Spring Boot 3 &bull; JDBC &bull; MySQL
+            </footer>
+        </div>
+    </div>
+
+    <!-- Initialize Lucide Icons & Responsive Toggle -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            const sidebar = document.getElementById('app-sidebar');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

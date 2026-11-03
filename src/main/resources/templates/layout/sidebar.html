@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<aside th:fragment="sidebar" id="app-sidebar" 
+       class="w-64 bg-white border-r border-stone-200 flex flex-col shrink-0 h-screen sticky top-0 transition-all duration-300 z-30">
+    
+    <!-- Brand Header -->
+    <div class="h-16 flex items-center px-6 border-b border-stone-200">
+        <a th:href="@{/dashboard}" class="flex items-center space-x-3 group">
+            <div class="w-9 h-9 rounded-xl bg-red-700 flex items-center justify-center text-white shadow-sm group-hover:bg-red-800 transition-colors">
+                <i data-lucide="droplets" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <span class="font-bold text-base tracking-tight text-stone-900 block leading-tight">Uthiram</span>
+                <span class="text-[11px] font-medium text-stone-400 block tracking-wider uppercase">Blood Bank</span>
+            </div>
+        </a>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+        <!-- Overview Group -->
+        <div>
+            <div class="px-3 mb-2 text-[11px] font-semibold text-stone-400 uppercase tracking-wider">Overview</div>
+            <div class="space-y-1">
+                <a th:href="@{/dashboard}" 
+                   th:class="${activeModule == 'dashboard' ? 'flex items-center px-3 py-2 text-sm font-semibold text-red-700 bg-red-50 rounded-xl border-r-2 border-red-700 transition-colors' : 'flex items-center px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-xl transition-colors'}">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 mr-3 shrink-0"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Management Group -->
+        <div>
+            <div class="px-3 mb-2 text-[11px] font-semibold text-stone-400 uppercase tracking-wider">Management</div>
+            <div class="space-y-1">
+                <a th:href="@{/donors}" 
+                   th:class="${activeModule == 'donors' ? 'flex items-center px-3 py-2 text-sm font-semibold text-red-700 bg-red-50 rounded-xl border-r-2 border-red-700 transition-colors' : 'flex items-center px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-xl transition-colors'}">
+                    <i data-lucide="users" class="w-4 h-4 mr-3 shrink-0"></i>
+                    <span>Donors</span>
+                </a>
+                <a th:href="@{/patients}" 
+                   th:class="${activeModule == 'patients' ? 'flex items-center px-3 py-2 text-sm font-semibold text-red-700 bg-red-50 rounded-xl border-r-2 border-red-700 transition-colors' : 'flex items-center px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-xl transition-colors'}">
+                    <i data-lucide="user-check" class="w-4 h-4 mr-3 shrink-0"></i>
+                    <span>Patients</span>
+                </a>
+                <a th:href="@{/donations}" 
+                   th:class="${activeModule == 'donations' ? 'flex items-center px-3 py-2 text-sm font-semibold text-red-700 bg-red-50 rounded-xl border-r-2 border-red-700 transition-colors' : 'flex items-center px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-xl transition-colors'}">
+                    <i data-lucide="heart-handshake" class="w-4 h-4 mr-3 shrink-0"></i>
+                    <span>Donations</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Inventory Group -->
+        <div>
+            <div class="px-3 mb-2 text-[11px] font-semibold text-stone-400 uppercase tracking-wider">Inventory</div>
+            <div class="space-y-1">
+                <a th:href="@{/inventory}" 
+                   th:class="${activeModule == 'inventory' ? 'flex items-center px-3 py-2 text-sm font-semibold text-red-700 bg-red-50 rounded-xl border-r-2 border-red-700 transition-colors' : 'flex items-center px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-xl transition-colors'}">
+                    <i data-lucide="boxes" class="w-4 h-4 mr-3 shrink-0"></i>
+                    <span>Stock Overview</span>
+                </a>
+                <a th:href="@{/inventory/available}" 
+                   th:class="${activeModule == 'available' ? 'flex items-center px-3 py-2 text-sm font-semibold text-red-700 bg-red-50 rounded-xl border-r-2 border-red-700 transition-colors' : 'flex items-center px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-xl transition-colors'}">
+                    <i data-lucide="check-circle" class="w-4 h-4 mr-3 shrink-0"></i>
+                    <span>Available Units</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Requests & Issues Group -->
+        <div>
+            <div class="px-3 mb-2 text-[11px] font-semibold text-stone-400 uppercase tracking-wider">Clinical Orders</div>
+            <div class="space-y-1">
+                <a th:href="@{/requests}" 
+                   th:class="${activeModule == 'requests' ? 'flex items-center px-3 py-2 text-sm font-semibold text-red-700 bg-red-50 rounded-xl border-r-2 border-red-700 transition-colors' : 'flex items-center px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-xl transition-colors'}">
+                    <i data-lucide="clipboard-list" class="w-4 h-4 mr-3 shrink-0"></i>
+                    <span>Blood Requests</span>
+                </a>
+                <a th:href="@{/issues}" 
+                   th:class="${activeModule == 'issues' ? 'flex items-center px-3 py-2 text-sm font-semibold text-red-700 bg-red-50 rounded-xl border-r-2 border-red-700 transition-colors' : 'flex items-center px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-xl transition-colors'}">
+                    <i data-lucide="history" class="w-4 h-4 mr-3 shrink-0"></i>
+                    <span>Issue History</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Reports Group -->
+        <div>
+            <div class="px-3 mb-2 text-[11px] font-semibold text-stone-400 uppercase tracking-wider">Analytics & Reports</div>
+            <div class="space-y-1">
+                <a th:href="@{/reports/inventory}" 
+                   th:class="${activeModule == 'reports-inventory' ? 'flex items-center px-3 py-2 text-sm font-semibold text-red-700 bg-red-50 rounded-xl border-r-2 border-red-700 transition-colors' : 'flex items-center px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-xl transition-colors'}">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4 mr-3 shrink-0"></i>
+                    <span>Inventory Report</span>
+                </a>
+                <a th:href="@{/reports/emergency}" 
+                   th:class="${activeModule == 'reports-emergency' ? 'flex items-center px-3 py-2 text-sm font-semibold text-red-700 bg-red-50 rounded-xl border-r-2 border-red-700 transition-colors' : 'flex items-center px-3 py-2 text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-xl transition-colors'}">
+                    <i data-lucide="alert-octagon" class="w-4 h-4 mr-3 shrink-0"></i>
+                    <span>Emergency Report</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Bottom User / Logout Section -->
+    <div class="p-3 border-t border-stone-200">
+        <div class="flex items-center justify-between p-2 rounded-xl bg-stone-50 border border-stone-200">
+            <div class="flex items-center space-x-2.5 overflow-hidden">
+                <div class="w-8 h-8 rounded-lg bg-stone-200 text-stone-700 flex items-center justify-center font-bold text-xs shrink-0">
+                    A
+                </div>
+                <div class="truncate">
+                    <div class="text-xs font-semibold text-stone-900 truncate" th:text="${#authentication != null ? #authentication.name : 'Administrator'}">admin@bloodbank.com</div>
+                    <div class="text-[10px] text-stone-500 flex items-center">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1"></span> Authorized
+                    </div>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post" class="shrink-0 ml-1">
+                <button type="submit" title="Sign Out" 
+                        class="p-1.5 text-stone-400 hover:text-red-700 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-stone-200">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
+
+</body>
+</html>
